@@ -1,0 +1,37 @@
+{
+  "name": "vue-use-firebase",
+  "version": "0.1.0",
+  "description": "Firebase with Composition API for vue",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/main.d.ts",
+  "scripts": {
+    "build": "bili",
+    "dev": "bili --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adwher/vue-use-firebase.git"
+  },
+  "keywords": [
+    "firebase",
+    "composition",
+    "vue"
+  ],
+  "author": "Andres Celis <adwher@outlook.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/adwher/vue-use-firebase/issues"
+  },
+  "homepage": "https://github.com/adwher/vue-use-firebase#readme",
+  "dependencies": {
+    "firebase": "^8.2.0",
+    "vue": "^3.0.4"
+  },
+  "devDependencies": {
+    "bili": "^5.0.5",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "terser-webpack-plugin": "^5.0.3",
+    "typescript": "^4.1.2"
+  }
+}
