@@ -2,16 +2,18 @@ import firebase from 'firebase/app'
 import 'firebase/firestore'
 
 import { onBeforeMount, reactive, readonly, ref } from 'vue'
-import { Collection, queryToRef } from '../firestore/collections'
+import { Collection, assignQueryToRef } from '../firestore/collections'
 
 export function usePaginate<T>(id: string, orderBy: string, take: number = 25) {
     const storage = firebase.firestore()
     const collection = storage.collection(id)
 
-    const metadata = reactive({ size: 0, page: 0 })
-    
-    const isLoading = ref(false)
     const docs = ref<Collection<T>>({})
+    const metadata = reactive({
+        size: 0,
+        page: 0,
+        isLoading: true,
+    })
 
     let last: firebase.firestore.DocumentData = undefined
 
@@ -20,27 +22,29 @@ export function usePaginate<T>(id: string, orderBy: string, take: number = 25) {
         last = results.docs[results.size - 1]
 
         docs.value = {}
-        queryToRef(docs, results)
+        assignQueryToRef(docs, results)
     }
 
     onBeforeMount(async function () {
-        isLoading.value = true
+        metadata.isLoading = true
 
         try {
-            const query = await collection.get()
-            metadata.size = query.size > take ? Math.round(query.size / take) : 1
-
             const begin = collection.limit(take).orderBy(orderBy)
             updateDocs(begin)
+
+            // metadata
+
+            const query = await collection.get()
+            metadata.size = query.size > take ? Math.round(query.size / take) : 1
         }
 
         finally {
-            isLoading.value = false
+            metadata.isLoading = false
         }
     })
 
     async function next() {
-        isLoading.value = true
+        metadata.isLoading = true
 
         try {
             if (metadata.page < (metadata.size - 1)) {
@@ -52,12 +56,12 @@ export function usePaginate<T>(id: string, orderBy: string, take: number = 25) {
         }
 
         finally {
-            isLoading.value = false
+            metadata.isLoading = false
         }
     }
 
     async function previous() {
-        isLoading.value = true
+        metadata.isLoading = true
 
         try {
             if (metadata.page > 0) {
@@ -69,9 +73,9 @@ export function usePaginate<T>(id: string, orderBy: string, take: number = 25) {
         }
 
         finally {
-            isLoading.value = false
+            metadata.isLoading = false
         }
     }
 
-    return { docs, metadata: readonly(metadata), isLoading, next, previous }
+    return { docs, metadata: readonly(metadata), next, previous }
 }

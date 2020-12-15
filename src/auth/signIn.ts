@@ -7,28 +7,43 @@ declare global {
     }
 }
 
+export type Provider = "Google" | "GitHub" | "Facebook" | "Twitter"
+
+function selectProvider(provider: Provider): firebase.auth.AuthProvider {
+    switch(provider) {
+        case "Facebook":
+            return new firebase.auth.FacebookAuthProvider()
+
+        case "GitHub":
+            return new firebase.auth.GithubAuthProvider()
+
+        case "Twitter":
+            return new firebase.auth.TwitterAuthProvider()
+
+        case "Google":
+        default:
+            return new firebase.auth.GoogleAuthProvider()
+    }
+}
+
 export function useSignIn() {
     const auth = firebase.auth()
 
     function configurateReCaptcha(container: string, options: Object) {
         window.recaptcha = new firebase.auth.RecaptchaVerifier(container, options)
+        window.recaptcha?.render()
     }
 
     // social
 
-    async function signInGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider()
-        await auth.signInWithPopup(provider)
+    async function signInRedirect(provider: Provider) {
+        let choosed = selectProvider(provider)
+        await auth.signInWithRedirect(choosed)
     }
 
-    async function signInFacebook() {
-        const provider = new firebase.auth.FacebookAuthProvider()
-        await auth.signInWithPopup(provider)
-    }
-
-    async function signInGitHub() {
-        const provider = new firebase.auth.GithubAuthProvider()
-        await auth.signInWithPopup(provider)
+    async function signInPopup(provider: Provider) {
+        let choosed = selectProvider(provider)
+        await auth.signInWithPopup(choosed)
     }
 
     // phoneNumber
@@ -52,9 +67,8 @@ export function useSignIn() {
     return {
         configurateReCaptcha,
         sendVerificationCode,
-        signInGoogle,
-        signInFacebook,
-        signInGitHub,
+        signInRedirect,
+        signInPopup,
         signInPhoneNumber,
         signInEmailPassword
     }

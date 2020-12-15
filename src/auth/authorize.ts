@@ -5,6 +5,8 @@ export default defineComponent({
     setup(props, { slots }) {
         const { isAnonymous, user } = useAuth()
 
-        return () => [isAnonymous.value ? slots.anonymous() : slots.allowed(user)]
+        return () => [
+            isAnonymous.value ? slots.anonymous?.call(null) : slots.allowed?.call(null, user)
+        ]
     },
 })

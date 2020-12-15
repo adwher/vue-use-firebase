@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-import { reactive, ref } from 'vue'
+import { onBeforeMount, reactive, ref } from 'vue'
 
 interface User {
     uid: string;

@@ -3,15 +3,15 @@ import 'firebase/firestore'
 
 import { onBeforeMount, Ref, ref } from 'vue'
 
+// collection
+
 export type Collection<D> = {
     [key: string]: D
 }
 
-export async function queryToRef<T>(target: Ref<Collection<T>>, query: firebase.firestore.QuerySnapshot) {
-    for (const doc of query.docs) {
-        Object.assign(target.value, { [doc.id]: doc.data() })
-    }
-}
+export type Query = firebase.firestore.QuerySnapshot
+
+// useCollection
 
 export function useCollection<T>(id: string) {
     const storage = firebase.firestore()
@@ -24,8 +24,7 @@ export function useCollection<T>(id: string) {
         isLoading.value = true
         
         try {
-            const results = await collection.get()
-            queryToRef(docs, results)
+            assignQueryToRef(docs, await collection.get())
         }
 
         finally {
@@ -70,4 +69,10 @@ export function useCollection<T>(id: string) {
     }
 
     return { docs, isLoading, obtain, put, update, remove, add }
+}
+
+export async function assignQueryToRef<T>(target: Ref<Collection<T>>, query: Query) {
+    for (const doc of query.docs) {
+        Object.assign(target.value, { [doc.id]: doc.data() })
+    }
 }
