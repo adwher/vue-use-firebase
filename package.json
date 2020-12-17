@@ -1,6 +1,6 @@
 {
   "name": "vue-use-firebase",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Firebase with Composition API for vue",
   "main": "dist/vue-use-firebase.cjs.js",
   "module": "dist/vue-use-firebase.esm.js",
