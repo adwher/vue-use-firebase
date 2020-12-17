@@ -6,7 +6,7 @@ export default defineComponent({
         const { isAnonymous, user } = useAuth()
 
         return () => [
-            isAnonymous.value ? slots.anonymous?.call(null) : slots.allowed?.call(null, user)
+            isAnonymous.value ? slots.default?.call(null) : slots.logged?.call(null, user)
         ]
     },
 })

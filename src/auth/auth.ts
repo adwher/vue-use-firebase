@@ -1,14 +1,16 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-import { onBeforeMount, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 interface User {
     uid: string;
     phoneNumber: string;
     email: string;
     displayName: string;
-    photoURL?: string;
+    photoURL: string;
+    createdAt: string;
+    signedAt: string;
 }
 
 export function useAuth() {
@@ -20,6 +22,8 @@ export function useAuth() {
         email: "",
         displayName: "",
         photoURL: "",
+        createdAt: "",
+        signedAt: "",
     })
 
     const isAnonymous = ref(true)
@@ -31,6 +35,8 @@ export function useAuth() {
             user.email = session.email
             user.phoneNumber = session.phoneNumber
             user.photoURL = session.photoURL
+            user.createdAt = session.metadata.creationTime
+            user.signedAt = session.metadata.lastSignInTime
 
             isAnonymous.value = false
         }
