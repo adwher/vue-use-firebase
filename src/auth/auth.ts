@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-import { reactive, ref } from 'vue'
+import { reactive, readonly } from 'vue'
 
 interface User {
     uid: string;
@@ -26,8 +26,6 @@ export function useAuth() {
         signedAt: "",
     })
 
-    const isAnonymous = ref(true)
-
     auth.onAuthStateChanged(function (session) {
         if (session !== null) {
             user.uid = session.uid
@@ -37,8 +35,6 @@ export function useAuth() {
             user.photoURL = session.photoURL
             user.createdAt = session.metadata.creationTime
             user.signedAt = session.metadata.lastSignInTime
-
-            isAnonymous.value = false
         }
 
         else {
@@ -47,15 +43,21 @@ export function useAuth() {
             user.email = null
             user.phoneNumber = null
             user.photoURL = null
-
-            isAnonymous.value = true
         }
 
     })
+
+    async function isLogged(): Promise<boolean> {
+        return new Promise(function (resolve) {
+            auth.onAuthStateChanged(function (session) {
+                return resolve(session !== null)
+            })
+        })
+    }
 
     async function signOut() {
         await auth.signOut()
     }
 
-    return { user, isAnonymous, signOut }
+    return { user: readonly(user), isLogged, signOut }
 }

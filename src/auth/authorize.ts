@@ -2,11 +2,12 @@ import { defineComponent } from 'vue'
 import { useAuth } from '../auth/auth'
 
 export default defineComponent({
-    setup(props, { slots }) {
-        const { isAnonymous, user } = useAuth()
+    async setup(props, { slots }) {
+        const { isLogged, user } = useAuth()
+        const isAuth = await isLogged()
 
         return () => [
-            isAnonymous.value ? slots.default?.call(null) : slots.logged?.call(null, user)
+            isAuth ? slots?.logged(null, user) : slots?.default()
         ]
     },
 })
