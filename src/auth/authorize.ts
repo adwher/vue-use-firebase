@@ -7,7 +7,7 @@ export default defineComponent({
         const isAuth = await isLogged()
 
         return () => [
-            isAuth ? slots?.logged(null, user) : slots?.default()
+            isAuth ? slots.logged?.call(null, user) : slots.default?.call(null)
         ]
     },
 })

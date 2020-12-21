@@ -7,13 +7,16 @@ export function useAnalytics() {
     const auth = firebase.auth()
 
     auth.onAuthStateChanged(function (session) {
-        if (session !== null) analytics.setUserId(session.uid)
-        else analytics.setUserId("")
+        analytics.setUserId(session?.uid ?? null)
     })
 
-    function record(name: string, payload: object = {}) {
+    function record(name: string, payload: object = null) {
         analytics.logEvent(name, payload)
     }
+
+    function setScreen(name: string) {
+        analytics.setCurrentScreen(name)
+    }
     
-    return { record }
+    return { record, setScreen }
 }
