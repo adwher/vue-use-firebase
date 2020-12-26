@@ -1,54 +1,62 @@
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 
-import { onBeforeMount, Ref, ref } from 'vue'
+import { ref, Ref, UnwrapRef } from 'vue'
 
-// collection
+export type CollectionRef<T> = Ref<{ [key: string]: UnwrapRef<T> }>
 
-export type Collection<D> = {
-    [key: string]: D
+export interface Collection<T> {
+    put: (id: string, document: T) => void
+    update: (id: string, document: T) => void
+    remove: (id: string) => void
+    add: (document: T) => Promise<string>
+    
+    docs: CollectionRef<T>
+    doc: (id: string) => Promise<Doc<T> | undefined>
 }
 
-export type Query = firebase.firestore.QuerySnapshot
+export interface Doc<T> {
+    data: Ref<UnwrapRef<T>>
+    subcollection: <S>(id: string) => Collection<S>
+}
 
-// useCollection
+function useReference<T>(collection: firebase.firestore.CollectionReference) {
+    const docs = ref<{ [key: string]: T }>({})
 
-export function useCollection<T>(id: string) {
-    const storage = firebase.firestore()
-    const collection = storage.collection(id)
-
-    const docs = ref<Collection<T>>({})
-    const isLoading = ref(false)
-
-    onBeforeMount(async function () {
-        isLoading.value = true
-        
-        try {
-            assignQueryToRef(docs, await collection.get())
-        }
-
-        finally {
-            isLoading.value = false
-        }
-    })
-
-    collection.onSnapshot(function (snapshot) {
-        snapshot.docChanges().forEach(function (change) {
-            if (change.type === "removed") {
-                delete docs.value[change.doc.id]
+    collection.get()
+        .then(function (reference) {
+            for (const doc of reference.docs) {
+                Object.assign(docs.value, { [doc.id]: doc.data() })
             }
-
-            else {
-                Object.assign(docs.value, { [change.doc.id]: change.doc.data() })
-            }
+    
+            collection.onSnapshot(function (snapshot) {
+                snapshot.docChanges().forEach(function (event) {
+                    if (event.type === "removed") delete docs.value[event.doc.id]
+                    else {
+                        Object.assign(docs.value, { [event.doc.id]: event.doc.data() })
+                    }
+                })
+            })
         })
-    })
 
-    // crud
+    async function doc(id: string): Promise<Doc<T> | undefined> {
+        const reference = await collection.doc(id).get()
 
-    async function obtain(id: string): Promise<T | undefined> {
-        const result = await collection.doc(id).get()
-        return result.exists ? result.data() as T : undefined
+        if (reference.exists) {
+            const data = ref(reference.data() as T)
+
+            reference.ref.onSnapshot(function () {
+                data.value = null
+                Object.assign(data.value, reference.data())
+            })
+
+            return {
+                data: data,
+                subcollection: (path) => useReference(reference.ref.collection(path))
+            }
+        }
+
+        else return undefined
     }
 
     async function put(id: string, document: T) {
@@ -64,15 +72,16 @@ export function useCollection<T>(id: string) {
     }
 
     async function add(document: T): Promise<string> {
-        const result = await collection.add(document)
-        return result.id
+        const reference = await collection.add(document)
+        return reference.id
     }
 
-    return { docs, isLoading, obtain, put, update, remove, add }
+    return { docs, doc, put, update, remove, add }
 }
 
-export async function assignQueryToRef<T>(target: Ref<Collection<T>>, query: Query) {
-    for (const doc of query.docs) {
-        Object.assign(target.value, { [doc.id]: doc.data() })
-    }
+export function useCollection<T>(id: string): Collection<T> {
+    const firestore = firebase.firestore()
+    const collection = firestore.collection(id)
+    
+    return useReference(collection)
 }

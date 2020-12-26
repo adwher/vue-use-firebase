@@ -1,9 +1,5 @@
-export { useCollection } from './firestore/collections'
-export { usePaginate } from './firestore/filters'
-
-export { useAuth } from './auth/auth'
-export { useSignIn } from './auth/signIn'
-
-export { useRemoteConfig } from './remoteConfig/remoteConfig'
+export { createInfiniteScroll, useCollection } from './firestore'
+export { useAuth, useSignIn } from './auth'
+export { useRemoteConfig } from './remoteConfig/'
 
 export { createFirebasePlugin } from './install'
