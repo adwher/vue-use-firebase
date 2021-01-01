@@ -1,4 +1,4 @@
-import { App } from 'vue'
+import { App } from "vue"
 import Authorize from "./auth/authorize"
 
 export function createFirebasePlugin() {
@@ -6,5 +6,5 @@ export function createFirebasePlugin() {
         install(app: App) {
             app.component("FirebaseAuthorize", Authorize)
         }
-    }  
+    }
 }

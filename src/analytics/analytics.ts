@@ -1,6 +1,6 @@
-import firebase from 'firebase/app'
-import 'firebase/analytics'
-import 'firebase/auth'
+import firebase from "firebase/app"
+import "firebase/analytics"
+import "firebase/auth"
 
 export function useAnalytics() {
     const analytics = firebase.analytics()
@@ -17,6 +17,6 @@ export function useAnalytics() {
     function setScreen(name: string) {
         analytics.setCurrentScreen(name)
     }
-    
+
     return { record, setScreen }
 }

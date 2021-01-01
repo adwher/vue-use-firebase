@@ -9,9 +9,6 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "lib": [
-            "ESNext",
-            "DOM"
-        ]
+        "lib": ["ESNext", "DOM"]
     }
 }

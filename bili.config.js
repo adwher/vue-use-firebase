@@ -6,5 +6,5 @@ export default {
         fileName: "vue-use-firebase.[format][ext]",
         minify: true,
         sourceMap: false
-    },
+    }
 }

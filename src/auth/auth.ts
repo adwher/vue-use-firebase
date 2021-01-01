@@ -1,16 +1,22 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import firebase from "firebase/app"
+import "firebase/auth"
 
-import { reactive, readonly } from 'vue'
+import { reactive, readonly } from "vue"
 
 interface User {
-    uid: string;
-    phoneNumber: string;
-    email: string;
-    displayName: string;
-    photoURL: string;
-    createdAt: string;
-    signedAt: string;
+    uid: string
+    phoneNumber: string
+    email: string
+    displayName: string
+    photoURL: string
+    createdAt: string
+    signedAt: string
+}
+
+interface UserData {
+    phoneNumber?: string
+    email?: string
+    displayName?: string
 }
 
 export function useAuth() {
@@ -23,7 +29,7 @@ export function useAuth() {
         displayName: "",
         photoURL: "",
         createdAt: "",
-        signedAt: "",
+        signedAt: ""
     })
 
     auth.onAuthStateChanged(function (session) {
@@ -36,15 +42,16 @@ export function useAuth() {
             user.createdAt = session.metadata.creationTime
             user.signedAt = session.metadata.lastSignInTime
         }
-
+        
         else {
             user.uid = null
             user.displayName = null
             user.email = null
             user.phoneNumber = null
             user.photoURL = null
+            user.createdAt = null
+            user.signedAt = null
         }
-
     })
 
     async function isLogged(): Promise<boolean> {
@@ -55,9 +62,21 @@ export function useAuth() {
         })
     }
 
+    async function updateData(data: UserData) {
+        const user = auth.currentUser
+
+        if (user !== null) {
+            user.email = data.email ?? user.email
+            user.phoneNumber = data.phoneNumber ?? user.phoneNumber
+            user.displayName = data.displayName ?? user.displayName
+
+            auth.updateCurrentUser(user)
+        }
+    }
+
     async function signOut() {
         await auth.signOut()
     }
 
-    return { user: readonly(user), isLogged, signOut }
+    return { user: readonly(user), updateData, isLogged, signOut }
 }

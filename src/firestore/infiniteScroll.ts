@@ -1,7 +1,7 @@
-import firebase from 'firebase/app'
-import 'firebase/firestore'
+import firebase from "firebase/app"
+import "firebase/firestore"
 
-import { onBeforeMount, onBeforeUnmount, reactive, ref } from 'vue'
+import { onBeforeMount, onBeforeUnmount, reactive, ref } from "vue"
 
 export function createInfiniteScroll<T>(id: string, take: number = 20) {
     const firestore = firebase.firestore()
@@ -16,9 +16,10 @@ export function createInfiniteScroll<T>(id: string, take: number = 20) {
 
     async function updateDocs() {
         metadata.isLoading = true
-        
+
         try {
             const results = await query.get()
+
             last = results.docs[results.size - 1]
             unsuscribe = query.onSnapshot(onSnapshotChange)
 
@@ -26,7 +27,7 @@ export function createInfiniteScroll<T>(id: string, take: number = 20) {
                 Object.assign(docs.value, { [doc.id]: doc.data() })
             }
         }
-
+        
         finally {
             metadata.isLoading = false
         }
@@ -37,19 +38,25 @@ export function createInfiniteScroll<T>(id: string, take: number = 20) {
             if (change.type === "removed") {
                 delete docs.value[change.doc.id]
             }
-
+            
             else {
-                Object.assign(docs.value, { [change.doc.id]: change.doc.data() })
+                Object.assign(docs.value, {
+                    [change.doc.id]: change.doc.data()
+                })
             }
         })
     }
 
-    onBeforeMount(updateDocs)
+    onBeforeMount(async () => {
+        await updateDocs()
+        await firestore.enablePersistence({ synchronizeTabs: true })
+    })
+
     onBeforeUnmount(unsuscribe)
 
-    function loadMore() {
+    async function loadMore() {
         query = query.startAfter(last)
-        updateDocs()
+        await updateDocs()
     }
 
     return { docs, metadata, loadMore }

@@ -1,1 +1,1 @@
-export { useRemoteConfig } from './remoteConfig'
+export { useRemoteConfig } from "./remoteConfig"

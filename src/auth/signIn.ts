@@ -1,5 +1,5 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+import firebase from "firebase/app"
+import "firebase/auth"
 
 declare global {
     interface Window {
@@ -10,7 +10,7 @@ declare global {
 export type Provider = "Google" | "GitHub" | "Facebook" | "Twitter"
 
 function selectProvider(provider: Provider): firebase.auth.AuthProvider {
-    switch(provider) {
+    switch (provider) {
         case "Facebook":
             return new firebase.auth.FacebookAuthProvider()
 
@@ -31,7 +31,11 @@ export function useSignIn() {
     auth.useDeviceLanguage()
 
     async function configurateReCaptcha(container: string, options: Object) {
-        window.recaptcha = new firebase.auth.RecaptchaVerifier(container, options)
+        window.recaptcha = new firebase.auth.RecaptchaVerifier(
+            container,
+            options
+        )
+
         await window.recaptcha?.render()
     }
 
@@ -50,12 +54,20 @@ export function useSignIn() {
     // phoneNumber
 
     async function signInPhoneNumber(sessionId: string, code: string) {
-        const credential = firebase.auth.PhoneAuthProvider.credential(sessionId, code)
+        const credential = firebase.auth.PhoneAuthProvider.credential(
+            sessionId,
+            code
+        )
+
         await auth.signInWithCredential(credential)
     }
 
     async function sendVerificationCode(phoneNumber: string): Promise<string> {
-        const result = await auth.signInWithPhoneNumber(phoneNumber, window.recaptcha)
+        const result = await auth.signInWithPhoneNumber(
+            phoneNumber,
+            window.recaptcha
+        )
+        
         return result.verificationId
     }
 
