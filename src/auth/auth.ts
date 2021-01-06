@@ -1,13 +1,13 @@
 import firebase from "firebase/app"
 import "firebase/auth"
 
-import { reactive, readonly } from "vue"
+import { onUnmounted, readonly, reactive } from "vue"
 
-interface User {
+export interface User {
     uid: string
+    displayName: string
     phoneNumber: string
     email: string
-    displayName: string
     photoURL: string
     createdAt: string
     signedAt: string
@@ -21,19 +21,28 @@ interface UserData {
 
 export function useAuth() {
     const auth = firebase.auth()
-
     const user = reactive<User>({
         uid: "",
-        phoneNumber: "",
-        email: "",
         displayName: "",
+        email: "",
+        phoneNumber: "",
         photoURL: "",
         createdAt: "",
-        signedAt: ""
+        signedAt: "",
     })
+    
+    const unsuscribe = auth.onAuthStateChanged(function (session) {
+        if (session === null) {
+            user.uid = ""
+            user.displayName = ""
+            user.email = ""
+            user.phoneNumber = ""
+            user.photoURL = ""
+            user.createdAt = ""
+            user.signedAt = ""
+        }
 
-    auth.onAuthStateChanged(function (session) {
-        if (session !== null) {
+        else {
             user.uid = session.uid
             user.displayName = session.displayName
             user.email = session.email
@@ -42,17 +51,9 @@ export function useAuth() {
             user.createdAt = session.metadata.creationTime
             user.signedAt = session.metadata.lastSignInTime
         }
-        
-        else {
-            user.uid = null
-            user.displayName = null
-            user.email = null
-            user.phoneNumber = null
-            user.photoURL = null
-            user.createdAt = null
-            user.signedAt = null
-        }
     })
+
+    onUnmounted(unsuscribe)
 
     async function isLogged(): Promise<boolean> {
         return new Promise(function (resolve) {
@@ -63,14 +64,14 @@ export function useAuth() {
     }
 
     async function updateData(data: UserData) {
-        const user = auth.currentUser
+        const session = auth.currentUser
 
-        if (user !== null) {
-            user.email = data.email ?? user.email
-            user.phoneNumber = data.phoneNumber ?? user.phoneNumber
-            user.displayName = data.displayName ?? user.displayName
+        if (session !== null) {
+            session.email = data.email ?? session.email
+            session.phoneNumber = data.phoneNumber ?? session.phoneNumber
+            session.displayName = data.displayName ?? session.displayName
 
-            auth.updateCurrentUser(user)
+            auth.updateCurrentUser(session)
         }
     }
 

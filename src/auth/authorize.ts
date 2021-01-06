@@ -1,15 +1,23 @@
-import { defineComponent, computed } from "vue"
+import { defineComponent, onBeforeMount, ref, watch } from "vue"
 import { useAuth } from "../auth/auth"
 
-export default defineComponent({
-    async setup(props, { slots }) {
-        const { user } = useAuth()
-        const isAnonymous = computed(() => user.uid === "" || user.uid === null)
+export const Authorize = defineComponent({
+    setup(props, { slots }) {
+        const { user, isLogged } = useAuth()
+        const isAuth = ref(false)
+
+        watch(() => user.uid, function (uid) {
+            isAuth.value = uid !== "" && uid !== null
+        })
+
+        onBeforeMount(async function () {
+            isAuth.value = await isLogged()
+        })
 
         return () => [
-            isAnonymous.value
-                ? slots.default?.call(null)
-                : slots.logged?.call(null, user)
+            isAuth.value
+                ? slots.logged?.call(null, user)
+                : slots.default?.call(null)
         ]
     }
 })
