@@ -3,7 +3,7 @@ import "firebase/auth"
 
 import { onUnmounted, readonly, reactive } from "vue"
 
-export interface User {
+interface User {
     uid: string
     displayName: string
     phoneNumber: string

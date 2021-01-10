@@ -4,10 +4,10 @@
     "description": "Firebase with Composition API for vue",
     "main": "dist/vue-use-firebase.cjs.js",
     "module": "dist/vue-use-firebase.esm.js",
-    "types": "dist/main.d.ts",
+    "types": "dist/types/main.d.ts",
     "scripts": {
-        "build": "bili",
-        "dev": "bili --watch"
+        "build": "rollup -c && tsc --emitDeclarationOnly",
+        "dev": "rollup -c -w"
     },
     "repository": {
         "type": "git",
@@ -18,7 +18,7 @@
         "composition",
         "vue"
     ],
-    "author": "Andres Celis <adwher@outlook.com>",
+    "author": "Andres Celis",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/adwher/vue-use-firebase/issues"
@@ -29,11 +29,9 @@
         "vue": "^3.0.4"
     },
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.11.1",
-        "@typescript-eslint/parser": "^4.11.1",
-        "bili": "^5.0.5",
-        "rollup-plugin-typescript2": "^0.29.0",
-        "terser-webpack-plugin": "^5.0.3",
-        "typescript": "^4.1.2"
+        "esbuild": "^0.8.31",
+        "rollup": "^2.36.1",
+        "rollup-plugin-esbuild": "^2.6.1",
+        "typescript": "^4.1.3"
     }
 }

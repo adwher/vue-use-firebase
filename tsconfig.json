@@ -10,5 +10,6 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "lib": ["ESNext", "DOM"]
-    }
+    },
+    "include": ["src/**/*.ts", "src/**/*.js"]
 }
