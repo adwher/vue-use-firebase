@@ -26,7 +26,7 @@ export default [
                 exclude: /node_modules/,
                 sourceMap: false,
                 minify: true,
-                target: "es2015",
+                target: "es2017",
             }),
         ]
     }
