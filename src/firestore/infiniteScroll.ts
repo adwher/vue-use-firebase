@@ -3,14 +3,14 @@ import "firebase/firestore"
 
 import { onBeforeMount, onBeforeUnmount, reactive, ref } from "vue"
 
-export function createInfiniteScroll<T>(id: string, take: number = 20) {
+export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: number = 5) {
+    query = query.limit(take)
+    
     const firestore = firebase.firestore()
-    const collection = firestore.collection(id)
-
+    
     const docs = ref<{ [key: string]: T }>({})
     const metadata = reactive({ isLoading: true })
 
-    let query = collection.limit(take)
     let last: firebase.firestore.DocumentData
     let unsuscribe = query.onSnapshot(onSnapshotChange)
 
@@ -60,4 +60,11 @@ export function createInfiniteScroll<T>(id: string, take: number = 20) {
     }
 
     return { docs, metadata, loadMore }
+}
+
+export function useInfiniteScroll(id: string, take: number = 5) {
+    const firestore = firebase.firestore()
+    const collection = firestore.collection(id)
+
+    return createInfiniteScroll(collection, take)
 }
