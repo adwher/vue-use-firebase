@@ -1,25 +1,55 @@
 import firebase from "firebase/app"
 import "firebase/firestore"
 
-import { onBeforeUnmount, ref, Ref, UnwrapRef } from "vue"
+import { onBeforeMount, onBeforeUnmount, ref, Ref, UnwrapRef } from "vue"
 
-export type CollectionRef<T> = Ref<{ [key: string]: UnwrapRef<T> }>
+type Docs<T> = { [key: string]: T }
+type DocsRef<T> = Ref<{ [key: string]: UnwrapRef<T> }>
 
-export interface Collection<T> {
+interface Collection<T> {
+    docs: () => DocsRef<T>
     put: (id: string, document: T) => void
     update: (id: string, document: T) => void
     remove: (id: string) => void
     add: (document: T) => Promise<string>
-    doc: (id: string) => Promise<Doc<T> | undefined>
+    obtain: (id: string) => Promise<Doc<T> | undefined>
 }
 
-export interface Doc<T> {
+interface Doc<T> {
     data: Ref<UnwrapRef<T>>
     subcollection: <S>(id: string) => Collection<S>
 }
 
-function useReference<T>(collection: firebase.firestore.CollectionReference) {
-    async function doc(id: string): Promise<Doc<T> | undefined> {
+function createReference<T>(collection: firebase.firestore.CollectionReference) {
+
+    function docs(): DocsRef<T> {
+        const docs = ref<Docs<T>>({})
+        
+        onBeforeMount(async function () {
+            const reference = await collection.get()
+            reference.docs.forEach(doc => Object.assign(docs.value, { [doc.id]: doc.data() }))
+        })
+
+        const unsuscribe = collection.onSnapshot(function (data) {
+            data.docChanges().forEach(function (change) {
+                const doc = change.doc
+
+                if (change.type === "removed") {
+                    delete docs.value[change.doc.id]
+                }
+
+                else {
+                    Object.assign(docs.value, { [doc.id]: doc.data() })
+                }
+            })
+        })
+
+        onBeforeUnmount(unsuscribe)
+
+        return docs
+    }
+
+    async function obtain(id: string): Promise<Doc<T> | undefined> {
         const reference = await collection.doc(id).get()
 
         if (reference.exists) {
@@ -34,8 +64,7 @@ function useReference<T>(collection: firebase.firestore.CollectionReference) {
 
             return {
                 data: data,
-                subcollection: path =>
-                    useReference(reference.ref.collection(path))
+                subcollection: path => createReference(reference.ref.collection(path))
             }
         }
         
@@ -59,12 +88,12 @@ function useReference<T>(collection: firebase.firestore.CollectionReference) {
         return reference.id
     }
 
-    return { doc, put, update, remove, add }
+    return { docs, put, update, remove, add, obtain }
 }
 
 export function useCollection<T>(id: string): Collection<T> {
     const firestore = firebase.firestore()
     const collection = firestore.collection(id)
 
-    return useReference(collection)
+    return createReference(collection)
 }

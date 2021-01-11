@@ -7,7 +7,7 @@ declare global {
     }
 }
 
-export type Provider = "Google" | "GitHub" | "Facebook" | "Twitter"
+type Provider = "Google" | "GitHub" | "Facebook" | "Twitter"
 
 function selectProvider(provider: Provider): firebase.auth.AuthProvider {
     switch (provider) {
@@ -30,7 +30,7 @@ export function useSignIn() {
     const auth = firebase.auth()
     auth.useDeviceLanguage()
 
-    async function configurateReCaptcha(container: string, options: Object) {
+    async function setupReCaptcha(container: string, options: Object) {
         window.recaptcha = new firebase.auth.RecaptchaVerifier(
             container,
             options
@@ -78,7 +78,7 @@ export function useSignIn() {
     }
 
     return {
-        configurateReCaptcha,
+        setupReCaptcha,
         sendVerificationCode,
         signInRedirect,
         signInPopup,

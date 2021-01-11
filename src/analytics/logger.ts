@@ -2,7 +2,7 @@ import firebase from "firebase/app"
 import "firebase/analytics"
 import "firebase/auth"
 
-export function useAnalytics() {
+export function useLogger() {
     const analytics = firebase.analytics()
     const auth = firebase.auth()
 
@@ -10,13 +10,10 @@ export function useAnalytics() {
         analytics.setUserId(session?.uid ?? null)
     })
 
-    function record(name: string, payload: object = null) {
+    function record(name: string, screen: string, payload: object = null) {
+        analytics.setCurrentScreen(screen)
         analytics.logEvent(name, payload)
     }
 
-    function setScreen(name: string) {
-        analytics.setCurrentScreen(name)
-    }
-
-    return { record, setScreen }
+    return { record }
 }

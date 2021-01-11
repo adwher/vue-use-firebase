@@ -6,8 +6,6 @@ import { onBeforeMount, onBeforeUnmount, reactive, ref } from "vue"
 export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: number = 5) {
     query = query.limit(take)
     
-    const firestore = firebase.firestore()
-    
     const docs = ref<{ [key: string]: T }>({})
     const metadata = reactive({ isLoading: true })
 
@@ -33,6 +31,8 @@ export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: n
         }
     }
 
+    onBeforeMount(updateDocs)
+
     async function onSnapshotChange(snapshot: firebase.firestore.QuerySnapshot) {
         snapshot.docChanges().forEach(function (change) {
             if (change.type === "removed") {
@@ -47,12 +47,7 @@ export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: n
         })
     }
 
-    onBeforeMount(async () => {
-        await updateDocs()
-        await firestore.enablePersistence({ synchronizeTabs: true })
-    })
-
-    onBeforeUnmount(unsuscribe)
+    onBeforeUnmount(() => unsuscribe())
 
     async function loadMore() {
         query = query.startAfter(last)

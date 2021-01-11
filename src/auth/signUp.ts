@@ -8,5 +8,9 @@ export function useSignUp() {
         await auth.createUserWithEmailAndPassword(email, password)
     }
 
-    return { signUpEmailPassword }
+    async function signUpAnonymously() {
+        await auth.signInAnonymously()
+    }
+
+    return { signUpEmailPassword, signUpAnonymously }
 }

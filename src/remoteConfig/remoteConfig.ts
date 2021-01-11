@@ -1,14 +1,14 @@
 import firebase from "firebase/app"
 import "firebase/remote-config"
 
-export type Config = { [key: string]: string }
+type Config = { [key: string]: string }
 
 export function useRemoteConfig<T extends Config>(defaultConfig?: T) {
     const remote = firebase.remoteConfig()
 
     remote.settings = {
         fetchTimeoutMillis: 500_000,
-        minimumFetchIntervalMillis: 100
+        minimumFetchIntervalMillis: 300
     }
 
     remote.defaultConfig = defaultConfig || {}
