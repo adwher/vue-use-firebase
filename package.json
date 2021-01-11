@@ -2,11 +2,11 @@
     "name": "vue-use-firebase",
     "version": "0.3.2",
     "description": "Firebase with Composition API for vue",
-    "main": "dist/vue-use-firebase.cjs.js",
-    "module": "dist/vue-use-firebase.esm.js",
+    "main": "dist/vue-use-firebase.js",
     "types": "dist/types/main.d.ts",
     "scripts": {
-        "build": "rollup -c && tsc --emitDeclarationOnly",
+        "build": "rollup -c",
+        "declarate": "tsc --emitDeclarationOnly",
         "dev": "rollup -c -w"
     },
     "repository": {
