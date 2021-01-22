@@ -3,11 +3,12 @@ import "firebase/firestore"
 
 import { onBeforeMount, onBeforeUnmount, ref, Ref, UnwrapRef } from "vue"
 
-type Docs<T> = { [key: string]: T }
-type DocsRef<T> = Ref<{ [key: string]: UnwrapRef<T> }>
+// collection
+
+type Docs<T> = Ref<{ [key: string]: UnwrapRef<T> }>
 
 interface Collection<T> {
-    docs: () => DocsRef<T>
+    list: () => Docs<T>
     put: (id: string, document: T) => void
     update: (id: string, document: T) => void
     remove: (id: string) => void
@@ -16,39 +17,35 @@ interface Collection<T> {
 }
 
 interface Doc<T> {
-    data: Ref<UnwrapRef<T>>
+    value: Ref<UnwrapRef<T>>
     subcollection: <S>(id: string) => Collection<S>
 }
 
 function createReference<T>(collection: firebase.firestore.CollectionReference) {
+    function list(): Docs<T> {
+        const docs = ref<Docs<T>>(Object.create(null))
 
-    function docs(): DocsRef<T> {
-        const docs = ref<Docs<T>>({})
-        
         onBeforeMount(async function () {
             const reference = await collection.get()
             reference.docs.forEach(doc => Object.assign(docs.value, { [doc.id]: doc.data() }))
         })
 
-        const unsuscribe = collection.onSnapshot(function (data) {
-            data.docChanges().forEach(function (change) {
-                const doc = change.doc
-
+        const unsuscribe = collection.onSnapshot(snap => {
+            snap.docChanges().forEach(change => {
                 if (change.type === "removed") {
                     delete docs.value[change.doc.id]
                 }
-
+    
                 else {
-                    Object.assign(docs.value, { [doc.id]: doc.data() })
+                    Object.assign(docs.value, { [change.doc.id]: change.doc.data() })
                 }
             })
         })
-
+        
         onBeforeUnmount(unsuscribe)
-
         return docs
     }
-
+    
     async function obtain(id: string): Promise<Doc<T> | undefined> {
         const reference = await collection.doc(id).get()
 
@@ -63,7 +60,7 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
             onBeforeUnmount(unsuscribe)
 
             return {
-                data: data,
+                value: data,
                 subcollection: path => createReference(reference.ref.collection(path))
             }
         }
@@ -88,12 +85,12 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
         return reference.id
     }
 
-    return { docs, put, update, remove, add, obtain }
+    return { list, put, update, remove, add, obtain }
 }
 
-export function useCollection<T>(id: string): Collection<T> {
+export function useCollection<T>(id: string) {
     const firestore = firebase.firestore()
     const collection = firestore.collection(id)
 
-    return createReference(collection)
+    return createReference<T>(collection)
 }

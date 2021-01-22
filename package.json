@@ -1,8 +1,11 @@
 {
     "name": "vue-use-firebase",
-    "version": "0.4.1",
+    "version": "0.4.1-alpha.1",
     "description": "Firebase with Composition API for vue",
-    "main": "dist/vue-use-firebase.js",
+    "main": "dist/vue-use-firebase.cjs.js",
+    "browser": "dist/vue-use-firebase.iife.js",
+    "unpkg": "dist/vue-use-firebase.iife.js",
+    "jsilvr": "dist/vue-use-firebase.iife.js",
     "types": "dist/types/main.d.ts",
     "scripts": {
         "test": "jest",

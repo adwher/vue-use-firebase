@@ -1,7 +1,7 @@
 import firebase from "firebase/app"
 import "firebase/firestore"
 
-import { onBeforeMount, onBeforeUnmount, reactive, ref } from "vue"
+import { onBeforeMount, onBeforeUnmount, reactive, readonly, ref } from "vue"
 
 export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: number = 5) {
     query = query.limit(take)
@@ -50,11 +50,15 @@ export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: n
     onBeforeUnmount(() => unsuscribe())
 
     async function loadMore() {
-        query = query.startAfter(last)
-        await updateDocs()
+        console.log("hello")
+
+        if (last !== undefined || last !== null) {
+            query = query.startAfter(last)
+            await updateDocs()
+        }
     }
 
-    return { docs, metadata, loadMore }
+    return { docs, metadata: readonly(metadata), loadMore }
 }
 
 export function useInfiniteScroll(id: string, take: number = 5) {
