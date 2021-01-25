@@ -1,11 +1,35 @@
 # vue-use-firebase
 
-Firebase with Composition API for vue
+Firebase with Composition API for vue.
+
+## Install
+
+`npm i -S vue@^3.0.0 firebase vue-use-firebase`
+
+## Usage
+
+```ts
+import { useAuth, useCollection } from "vue-use-firebase" // import just what you want
+```
+
+### Auth
+
+```ts
+import { useAuth } from "vue-use-firebase"
+
+const { user, signOut } = useAuth()
+
+function logOut() {
+    if (user.uid === "adwher") signOut()
+}
+```
+
+## Example
 
 ```vue
 <template>
     <section>
-        <input type="text" v-model="note">
+        <input type="text" v-model="text">
         <button @click="makeNote">Add</button>
 
         <div class="notes">
@@ -33,10 +57,10 @@ export default defineComponent({
         const { add, remove } = useCollection<Note>("notes")
         const { docs: notes, loadMore } = useInfiniteScroll<Note>("notes", 10)
 
-        const note = ref("")
-        const makeNote = () => add({ body: note.value, complete: false })
+        const text = ref("")
+        const makeNote = () => add({ body: text.value, complete: false })
 
-        return { makeNote, note, notes, loadMore }
+        return { makeNote, text, notes, loadMore }
     }
 })
 </script>
