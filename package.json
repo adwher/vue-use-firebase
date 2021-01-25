@@ -1,14 +1,15 @@
 {
     "name": "vue-use-firebase",
-    "version": "0.4.1-alpha.1",
+    "version": "0.4.1-alpha.2",
     "description": "Firebase with Composition API for vue",
     "main": "dist/vue-use-firebase.cjs.js",
+    "module": "dist/vue-use-firebase.esm.js",
     "browser": "dist/vue-use-firebase.iife.js",
     "unpkg": "dist/vue-use-firebase.iife.js",
     "jsilvr": "dist/vue-use-firebase.iife.js",
     "types": "dist/types/main.d.ts",
     "scripts": {
-        "test": "jest",
+        "test": "jest & tsc --emitDeclarationOnly",
         "build": "rollup -c",
         "declarate": "tsc --emitDeclarationOnly",
         "dev": "rollup -c -w"

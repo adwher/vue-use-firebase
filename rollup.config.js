@@ -1,6 +1,27 @@
 import esbuild from "rollup-plugin-esbuild"
 
+const IS_PRODUCTION = !process.env.ROLLUP_WATCH
+const EXTERNAL_DEPENDENCIES = [/firebase\/.*/, "firebase", "vue"]
+
 export default [
+    {
+        input: "src/main.ts",
+    
+        output: {
+            file: "dist/vue-use-firebase.esm.js",
+            format: "esm",
+        },
+    
+        external: EXTERNAL_DEPENDENCIES,
+    
+        plugins: [
+            esbuild({
+                minify: IS_PRODUCTION,
+                target: "es2015",
+            }),
+        ]
+    },  
+
     {
         input: "src/main.ts",
     
@@ -9,11 +30,11 @@ export default [
             format: "cjs",
         },
     
-        external: [/firebase\/.*/, "firebase", "vue"],
+        external: EXTERNAL_DEPENDENCIES,
     
         plugins: [
             esbuild({
-                minify: true,
+                minify: IS_PRODUCTION,
                 target: "es2015",
             }),
         ]
@@ -23,7 +44,7 @@ export default [
         input: "src/main.ts",
     
         output: {
-            name: "VueUseFirebase",
+            name: "vueUseFirebase",
             file: "dist/vue-use-firebase.iife.js",
             format: "iife",
             globals: {
@@ -32,11 +53,11 @@ export default [
             }
         },
     
-        external: [/firebase\/.*/, "firebase", "vue"],
+        external: EXTERNAL_DEPENDENCIES,
     
         plugins: [
             esbuild({
-                minify: true,
+                minify: IS_PRODUCTION,
                 target: "es2015",
             }),
         ]

@@ -75,5 +75,9 @@ export function useAuth() {
         }
     }
 
-    return { user: readonly(user), updateData, isLogged, signOut: auth.signOut }
+    async function signOut() {
+        await auth.signOut()
+    }
+
+    return { user: readonly(user), updateData, isLogged, signOut }
 }
