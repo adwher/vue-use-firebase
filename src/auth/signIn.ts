@@ -26,11 +26,15 @@ function selectProvider(provider: Provider): firebase.auth.AuthProvider {
     }
 }
 
+interface SetupReCatpchaOptions {
+    size: "visible" | "invisible"
+}
+
 export function useSignIn() {
     const auth = firebase.auth()
     auth.useDeviceLanguage()
 
-    async function setupReCaptcha(container: string, options: Object) {
+    async function setupReCaptcha(container: string, options?: SetupReCatpchaOptions) {
         window.recaptcha = new firebase.auth.RecaptchaVerifier(
             container,
             options

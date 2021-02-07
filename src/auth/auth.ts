@@ -56,8 +56,9 @@ export function useAuth() {
     onUnmounted(unsuscribe)
 
     async function isLogged(): Promise<boolean> {
-        return new Promise(function (resolve) {
-            auth.onAuthStateChanged(function (session) {
+        return new Promise(resolve => {
+            const unsuscribe = auth.onAuthStateChanged(session => {
+                unsuscribe()
                 return resolve(session !== null)
             })
         })

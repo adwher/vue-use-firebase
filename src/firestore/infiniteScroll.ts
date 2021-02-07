@@ -32,6 +32,7 @@ export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: n
     }
 
     onBeforeMount(updateDocs)
+    onBeforeUnmount(() => unsuscribe())
 
     async function onSnapshotChange(snapshot: firebase.firestore.QuerySnapshot) {
         snapshot.docChanges().forEach(function (change) {
@@ -46,8 +47,6 @@ export function createInfiniteScroll<T>(query: firebase.firestore.Query, take: n
             }
         })
     }
-
-    onBeforeUnmount(() => unsuscribe())
 
     async function loadMore() {
         console.log("hello")
