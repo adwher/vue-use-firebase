@@ -9,7 +9,8 @@ export const Authorize = defineComponent({
         const isLoading = ref(true)
 
         onBeforeMount(async function () {
-            isLoading.value = await isLogged()
+            isAuth.value = await isLogged()
+            isLoading.value = false
         })
 
         watch(() => user.uid, function (uid) {
