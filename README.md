@@ -47,6 +47,10 @@ function logOut() {
 import { useCollection, useInfiniteScroll } from "vue-use-firebase"
 import { defineComponent, ref } from "vue"
 
+import firebase from "firebase/app"
+
+firebase.initializeApp() // make the initialization
+
 interface Note {
     body: string
     complete: boolean

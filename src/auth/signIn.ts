@@ -27,7 +27,9 @@ function selectProvider(provider: Provider): firebase.auth.AuthProvider {
 }
 
 interface SetupReCatpchaOptions {
-    size: "visible" | "invisible"
+    size: "invisible" | "normal" | "compact"
+    theme: "light" | "dark"
+    badge: "bottomright" | "bottomleft" | "inline"
 }
 
 export function useSignIn() {
