@@ -1,4 +1,4 @@
 export { useAuth } from "./auth"
-export { Authorize } from "./authorize"
+export { Logged, NotLogged } from "./authorization"
 export { useSignIn } from "./signIn"
 export { useSignUp } from "./signUp"

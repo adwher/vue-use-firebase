@@ -53,7 +53,7 @@ export function useAuth() {
         }
     })
 
-    onUnmounted(unsuscribe)
+    onUnmounted(() => unsuscribe())
 
     async function isLogged(): Promise<boolean> {
         return new Promise(resolve => {
