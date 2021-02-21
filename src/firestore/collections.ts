@@ -18,7 +18,7 @@ interface Collection<T> {
 }
 
 interface Doc<T> {
-    data: Ref<UnwrapRef<T>> | null
+    data: Ref<UnwrapRef<T>>
     subcollection<S>(id: string): Collection<S>
 }
 
@@ -43,7 +43,7 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
             })
         })
         
-        onBeforeUnmount(unsuscribe)
+        onBeforeUnmount(() => unsuscribe)
         return docs
     }
     
@@ -51,14 +51,13 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
         const reference = await collection.doc(id).get()
 
         if (reference.exists) {
-            const data = ref(reference.data() as T)
+            const data = ref<T>(reference.data() as T)
 
             const unsuscribe = reference.ref.onSnapshot(function () {
-                data.value = null
-                Object.assign(data.value, reference.data())
+                data.value = reference.data() as UnwrapRef<T>
             })
 
-            onBeforeUnmount(unsuscribe)
+            onBeforeUnmount(() => unsuscribe)
 
             return {
                 data,
