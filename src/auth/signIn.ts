@@ -28,15 +28,15 @@ function selectProvider(provider: Provider): firebase.auth.AuthProvider {
 
 interface SetupReCatpchaOptions {
     size: "invisible" | "normal" | "compact"
-    theme: "light" | "dark"
-    badge: "bottomright" | "bottomleft" | "inline"
+    theme?: "light" | "dark"
+    badge?: "bottomright" | "bottomleft" | "inline"
 }
 
 export function useSignIn() {
     const auth = firebase.auth()
     auth.useDeviceLanguage()
 
-    async function setupReCaptcha(container: string, options?: SetupReCatpchaOptions) {
+    async function setupReCaptcha(container: string, options: SetupReCatpchaOptions) {
         window.recaptcha = new firebase.auth.RecaptchaVerifier(
             container,
             options

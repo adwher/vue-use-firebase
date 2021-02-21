@@ -1,6 +1,6 @@
 {
     "name": "vue-use-firebase",
-    "version": "0.4.3-alpha.1",
+    "version": "0.4.3-alpha.2",
     "description": "Firebase with Composition API for vue",
     "main": "dist/vue-use-firebase.cjs.js",
     "module": "dist/vue-use-firebase.esm.js",
@@ -30,7 +30,7 @@
     },
     "homepage": "https://github.com/adwher/vue-use-firebase#readme",
     "dependencies": {
-        "firebase": "^8.2.7",
+        "firebase": "^8.2.9",
         "vue": "^3.0.5"
     },
     "devDependencies": {

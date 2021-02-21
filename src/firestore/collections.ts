@@ -8,17 +8,18 @@ import { onBeforeMount, onBeforeUnmount, ref, Ref, UnwrapRef } from "vue"
 type Docs<T> = Ref<{ [key: string]: UnwrapRef<T> }>
 
 interface Collection<T> {
-    list: () => Docs<T>
-    put: (id: string, document: T) => void
-    update: (id: string, document: T) => void
-    remove: (id: string) => void
-    add: (document: T) => Promise<string>
-    obtain: (id: string) => Promise<Doc<T> | undefined>
+    list(): Docs<T>
+    put(id: string, document: T): void
+    update(id: string, document: T): void
+    remove(id: string): void
+    add(document: T): Promise<string>
+    obtain(id: string): Promise<Doc<T>>
+    exist(id: string): Promise<boolean>
 }
 
 interface Doc<T> {
-    value: Ref<UnwrapRef<T>>
-    subcollection: <S>(id: string) => Collection<S>
+    data: Ref<UnwrapRef<T>> | null
+    subcollection<S>(id: string): Collection<S>
 }
 
 function createReference<T>(collection: firebase.firestore.CollectionReference) {
@@ -46,7 +47,7 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
         return docs
     }
     
-    async function obtain(id: string): Promise<Doc<T> | undefined> {
+    async function obtain(id: string): Promise<Doc<T>> {
         const reference = await collection.doc(id).get()
 
         if (reference.exists) {
@@ -60,8 +61,8 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
             onBeforeUnmount(unsuscribe)
 
             return {
-                value: data,
-                subcollection: path => createReference(reference.ref.collection(path))
+                data,
+                subcollection: path => createReference(reference.ref.collection(path)),
             }
         }
         
@@ -80,12 +81,17 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
         await collection.doc(id).delete()
     }
 
-    async function add(document: T): Promise<string> {
+    async function add(document: T) {
         const reference = await collection.add(document)
         return reference.id
     }
 
-    return { list, put, update, remove, add, obtain }
+    async function exist(id: string) {
+        const reference = await collection.doc(id).get()
+        return reference.exists
+    }
+
+    return { list, put, update, remove, add, obtain, exist }
 }
 
 export function useCollection<T>(id: string) {
