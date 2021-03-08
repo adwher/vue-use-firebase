@@ -1,10 +1,12 @@
-import { defineComponent, ref, watch } from "vue"
-import { useAuth } from "./auth"
+import { defineComponent, onBeforeMount, ref, watch } from "vue"
+import { isLogged, useAuth } from "./auth"
 
-async function useLogged() {
-    const { user, isLogged } = useAuth()
+function useLogged() {
+    const { user } = useAuth()
 
-    const isAuth = ref(await isLogged())
+    const isAuth = ref(false)
+
+    onBeforeMount(async () => isAuth.value = await isLogged())
 
     watch(() => user.uid, function (uid) {	
         isAuth.value = uid !== "" && uid !== null	
@@ -14,15 +16,15 @@ async function useLogged() {
 }
 
 export const Logged = defineComponent({
-    async setup(props, { slots }) {
-        const { isAuth, user } = await useLogged()
+    setup(props, { slots }) {
+        const { isAuth, user } = useLogged()
         return () => [isAuth.value ? slots.default?.call(null, user) : null]
     }
 })
 
 export const NotLogged = defineComponent({
-    async setup(props, { slots }) {
-        const { isAuth } = await useLogged()
+    setup(props, { slots }) {
+        const { isAuth } = useLogged()
         return () => [isAuth.value ? null : slots.default?.call(null)]
-    }
+    },
 })

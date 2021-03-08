@@ -60,7 +60,7 @@ export function useAuth() {
     return { user: readonly(user), updateData, getToken }
 }
 
-export async function isLogged() {
+export async function isLogged(): Promise<boolean> {
     const auth = firebase.auth()
 
     return new Promise(resolve => {
