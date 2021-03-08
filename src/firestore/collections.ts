@@ -7,8 +7,10 @@ import { onBeforeMount, onBeforeUnmount, ref, Ref, UnwrapRef } from "vue"
 
 type Docs<T> = Ref<{ [key: string]: UnwrapRef<T> }>
 
+type CollectionReference = firebase.firestore.CollectionReference
+
 interface Collection<T> {
-    list(): Docs<T>
+    list(take?: number): Docs<T>
     put(id: string, document: T): void
     update(id: string, document: T): void
     remove(id: string): void
@@ -22,12 +24,12 @@ interface Doc<T> {
     subcollection<S>(id: string): Collection<S>
 }
 
-function createReference<T>(collection: firebase.firestore.CollectionReference) {
-    function list(): Docs<T> {
+function createReference<T>(collection: CollectionReference) {
+    function list(take = 25) {
         const docs = ref<Docs<T>>(Object.create(null))
 
         onBeforeMount(async function () {
-            const reference = await collection.get()
+            const reference = take ? await collection.limit(take).get() : await collection.get()
             reference.docs.forEach(doc => Object.assign(docs.value, { [doc.id]: doc.data() }))
         })
 
@@ -47,7 +49,7 @@ function createReference<T>(collection: firebase.firestore.CollectionReference) 
         return docs
     }
     
-    async function obtain(id: string): Promise<Doc<T>> {
+    async function obtain(id: string) {
         const reference = await collection.doc(id).get()
 
         if (reference.exists) {

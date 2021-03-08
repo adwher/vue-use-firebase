@@ -1,7 +1,7 @@
 import firebase from "firebase/app"
 import "firebase/auth"
 
-import { onUnmounted, readonly, reactive } from "vue"
+import { readonly, reactive } from "vue"
 
 interface User {
     uid: string
@@ -31,37 +31,27 @@ export function useAuth() {
         signedAt: "",
     })
     
-    const unsuscribe = auth.onAuthStateChanged(function (session) {
-        if (session === null) {
-            user.uid = ""
-            user.displayName = ""
-            user.email = ""
-            user.phoneNumber = ""
-            user.photoURL = ""
-            user.createdAt = ""
-            user.signedAt = ""
-        }
-
-        else {
-            user.uid = session.uid
-            user.displayName = session.displayName
-            user.email = session.email
-            user.phoneNumber = session.phoneNumber
-            user.photoURL = session.photoURL
-            user.createdAt = session.metadata.creationTime
-            user.signedAt = session.metadata.lastSignInTime
-        }
+    auth.onAuthStateChanged(function (session) {
+        user.uid = session?.uid ?? ""
+        user.displayName = session?.displayName ?? ""
+        user.email = session?.email ?? ""
+        user.phoneNumber = session?.phoneNumber ?? ""
+        user.photoURL = session?.photoURL ?? ""
+        user.createdAt = session?.metadata?.creationTime ?? ""
+        user.signedAt = session?.metadata?.lastSignInTime ?? ""
     })
 
-    onUnmounted(() => unsuscribe())
-
-    async function isLogged(): Promise<boolean> {
+    async function isLogged() {
         return new Promise(resolve => {
             const unsuscribe = auth.onAuthStateChanged(session => {
                 unsuscribe()
-                return resolve(session !== null)
+                return resolve(!!session)
             })
         })
+    }
+
+    async function getToken() {
+        return auth.currentUser.getIdToken()
     }
 
     async function updateData(data: UserData) {
@@ -80,5 +70,5 @@ export function useAuth() {
         await auth.signOut()
     }
 
-    return { user: readonly(user), updateData, isLogged, signOut }
+    return { user: readonly(user), updateData, isLogged, getToken, signOut }
 }
