@@ -36,8 +36,8 @@ export function useSignIn() {
     const auth = firebase.auth()
     auth.useDeviceLanguage()
 
-    async function setupReCaptcha(container: string, options: SetupReCatpchaOptions) {
-        if (window.recaptchaVerifier === null) {
+    async function setupRecaptcha(container: string, options: SetupReCatpchaOptions) {
+        if (window.recaptchaVerifier === undefined) {
             window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(container, options)
         }
 
@@ -84,7 +84,7 @@ export function useSignIn() {
     }
 
     return {
-        setupReCaptcha,
+        setupRecaptcha,
         sendVerificationCode,
         signInRedirect,
         signInPopup,
