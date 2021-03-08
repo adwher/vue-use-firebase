@@ -3,7 +3,7 @@ import "firebase/auth"
 
 declare global {
     interface Window {
-        recaptcha?: firebase.auth.RecaptchaVerifier
+        recaptchaVerifier?: firebase.auth.RecaptchaVerifier
     }
 }
 
@@ -37,15 +37,15 @@ export function useSignIn() {
     auth.useDeviceLanguage()
 
     async function setupReCaptcha(container: string, options: SetupReCatpchaOptions) {
-        if (window.recaptcha) {
-            window.recaptcha.clear()
-        }
-        
-        else {
-            window.recaptcha = new firebase.auth.RecaptchaVerifier(container, options)
+        if (window.recaptchaVerifier === null) {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(container, options)
         }
 
-        window.recaptcha.render()
+        else {
+            window.recaptchaVerifier?.clear()
+        }
+
+        window.recaptchaVerifier?.render()
     }
 
     // social
@@ -72,10 +72,7 @@ export function useSignIn() {
     }
 
     async function sendVerificationCode(phoneNumber: string): Promise<string> {
-        const result = await auth.signInWithPhoneNumber(
-            phoneNumber,
-            window.recaptcha
-        )
+        const result = await auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
         
         return result.verificationId
     }

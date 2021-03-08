@@ -1,30 +1,28 @@
-import { defineComponent, onBeforeMount, ref, watch } from "vue"
+import { defineComponent, onBeforeMount, reactive, watch } from "vue"
 import { isLogged, useAuth } from "./auth"
 
-function useLogged() {
-    const { user } = useAuth()
-
-    const isAuth = ref(false)
-
-    onBeforeMount(async () => isAuth.value = await isLogged())
-
-    watch(() => user.uid, function (uid) {	
-        isAuth.value = uid !== "" && uid !== null	
-    })
-
-    return { isAuth, user }
-}
-
-export const Logged = defineComponent({
+export const AuthView = defineComponent({
     setup(props, { slots }) {
-        const { isAuth, user } = useLogged()
-        return () => [isAuth.value ? slots.default?.call(null, user) : null]
+        const { user } = useAuth()
+
+        const state = reactive({
+            isAuth: false,
+            isLoading: true,
+        })
+
+        onBeforeMount(async function () {
+            state.isAuth = await isLogged()
+            state.isLoading = false
+        })
+
+        watch(() => user.uid, () => state.isAuth = user.uid !== null && user.uid !== "")
+
+        return () => [
+            state.isLoading
+                ? slots.fallback?.call(null)
+                : state.isAuth
+                    ? slots.logged?.call(null, user)
+                    : slots.default?.call(null)
+        ]
     }
-})
-
-export const NotLogged = defineComponent({
-    setup(props, { slots }) {
-        const { isAuth } = useLogged()
-        return () => [isAuth.value ? null : slots.default?.call(null)]
-    },
 })
