@@ -41,15 +41,6 @@ export function useAuth() {
         user.signedAt = session?.metadata?.lastSignInTime ?? ""
     })
 
-    async function isLogged() {
-        return new Promise(resolve => {
-            const unsuscribe = auth.onAuthStateChanged(session => {
-                unsuscribe()
-                return resolve(!!session)
-            })
-        })
-    }
-
     async function getToken() {
         return auth.currentUser.getIdToken()
     }
@@ -66,9 +57,21 @@ export function useAuth() {
         }
     }
 
-    async function signOut() {
-        await auth.signOut()
-    }
+    return { user: readonly(user), updateData, getToken }
+}
 
-    return { user: readonly(user), updateData, isLogged, getToken, signOut }
+export async function isLogged() {
+    const auth = firebase.auth()
+
+    return new Promise(resolve => {
+        const unsuscribe = auth.onAuthStateChanged(session => {
+            unsuscribe()
+            return resolve(!!session)
+        })
+    })
+}
+
+export async function signOut() {
+    const auth = firebase.auth()
+    await auth.signOut()
 }
