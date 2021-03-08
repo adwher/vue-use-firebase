@@ -46,12 +46,12 @@ export function useSignIn() {
     // social
 
     async function signInRedirect(provider: Provider) {
-        let choosed = selectProvider(provider)
+        const choosed = selectProvider(provider)
         await auth.signInWithRedirect(choosed)
     }
 
     async function signInPopup(provider: Provider) {
-        let choosed = selectProvider(provider)
+        const choosed = selectProvider(provider)
         await auth.signInWithPopup(choosed)
     }
 
