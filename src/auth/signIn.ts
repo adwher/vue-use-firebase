@@ -37,15 +37,13 @@ export function useSignIn() {
     auth.useDeviceLanguage()
 
     async function setupRecaptcha(container: string, options: SetupReCatpchaOptions) {
-        if (window.recaptchaVerifier === undefined) {
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(container, options)
+        if (window.recaptchaVerifier !== undefined) {
+            window.recaptchaVerifier.clear()
+            window.recaptchaVerifier = undefined
         }
 
-        else {
-            window.recaptchaVerifier?.clear()
-        }
-
-        window.recaptchaVerifier?.render()
+        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(container, options)
+        window.recaptchaVerifier.render()
     }
 
     // social
